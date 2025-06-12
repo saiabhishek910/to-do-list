@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Awesome To-Do List</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .todo-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            margin-top: 50px; /* Space from top */
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            background-color: #f8faff;
+            border-radius: 10px;
+            border: 1px solid #e0e7ee;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .task-item.completed {
+            background-color: #e6ffe6; /* Light green for completed */
+            border-color: #a8e0a8;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #6b7280; /* Gray out completed text */
+        }
+
+        .task-item .task-content {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            overflow: hidden; /* Hide overflow for long text */
+        }
+
+        .task-item .task-checkbox {
+            margin-right: 15px;
+            min-width: 20px; /* Ensure checkbox has space */
+            height: 20px;
+            accent-color: #4f46e5; /* Primary color for checkbox */
+            cursor: pointer;
+        }
+
+        .task-item .task-text {
+            flex-grow: 1;
+            font-size: 1.05rem;
+            color: #374151;
+            white-space: nowrap; /* Prevent text wrapping */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Add ellipsis for overflow */
+        }
+
+        .task-item .task-input-edit { /* New class for the input during edit */
+            flex-grow: 1;
+            font-size: 1.05rem;
+            padding: 5px 10px;
+            border: 1px solid #a8b0c4;
+            border-radius: 5px;
+            outline: none;
+            color: #374151;
+        }
+        .task-item .task-input-edit:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+
+        .task-item .task-actions {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0; /* Prevent actions from shrinking */
+            margin-left: 15px;
+        }
+
+        .task-item .action-button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-item .edit-button {
+            background-color: #3b82f6; /* Blue */
+            color: white;
+            border: none;
+        }
+        .task-item .edit-button:hover {
+            background-color: #2563eb;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .task-item .delete-button {
+            background-color: #ef4444; /* Red */
+            color: white;
+            border: none;
+        }
+        .task-item .delete-button:hover {
+            background-color: #dc2626;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .task-input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #4b5563;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .task-input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .add-button {
+            background-color: #4f46e5; /* Indigo */
+            color: white;
+            padding: 14px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .add-button:hover {
+            background-color: #4338ca;
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .empty-list-message {
+            text-align: center;
+            color: #6b7280;
+            font-style: italic;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px dashed #d1d5db;
+            border-radius: 8px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .todo-container {
+                padding: 20px;
+                margin-top: 20px;
+            }
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 12px 15px;
+            }
+            .task-item .task-content {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .task-item .task-checkbox {
+                margin-right: 10px;
+            }
+            .task-item .task-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-left: 0;
+            }
+            .task-item .action-button {
+                margin-left: 5px;
+                padding: 6px 10px;
+            }
+            .add-button {
+                width: 100%;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center">
+    <div class="todo-container">
+        <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-8">
+            <span class="bg-gradient-to-r from-indigo-500 to-purple-600 text-transparent bg-clip-text">
+                My To-Do List
+            </span>
+        </h1>
+
+        <div class="flex flex-col sm:flex-row gap-3 mb-8">
+            <input
+                type="text"
+                id="taskInput"
+                placeholder="Add a new task..."
+                class="task-input flex-grow"
+            />
+            <button
+                id="addTaskButton"
+                class="add-button flex-shrink-0"
+            >
+                Add Task
+            </button>
+        </div>
+
+        <ul id="taskList" class="space-y-3">
+            <!-- Default tasks - now fully interactive! -->
+            <li class="task-item flex items-center justify-between shadow-sm">
+                <div class="task-content">
+                    <input type="checkbox" class="task-checkbox">
+                    <span class="task-text">Buy groceries for the week</span>
+                </div>
+                <div class="task-actions">
+                    <button class="action-button edit-button">Edit</button>
+                    <button class="action-button delete-button">Delete</button>
+                </div>
+            </li>
+            <li class="task-item flex items-center justify-between shadow-sm completed">
+                <div class="task-content">
+                    <input type="checkbox" class="task-checkbox" checked>
+                    <span class="task-text">Finish Gemini API integration</span>
+                </div>
+                <div class="task-actions">
+                    <button class="action-button edit-button">Edit</button>
+                    <button class="action-button delete-button">Delete</button>
+                </div>
+            </li>
+            <li class="task-item flex items-center justify-between shadow-sm">
+                <div class="task-content">
+                    <input type="checkbox" class="task-checkbox">
+                    <span class="task-text">Plan weekend getaway</span>
+                </div>
+                <div class="task-actions">
+                    <button class="action-button edit-button">Edit</button>
+                    <button class="action-button delete-button">Delete</button>
+                </div>
+            </li>
+        </ul>
+
+        <p id="emptyListMessage" class="empty-list-message hidden">Your to-do list is empty. Add some tasks!</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const taskInput = document.getElementById('taskInput');
+            const addTaskButton = document.getElementById('addTaskButton');
+            const taskList = document.getElementById('taskList');
+            const emptyListMessage = document.getElementById('emptyListMessage');
+
+            // Function to update the visibility of the empty list message
+            const updateEmptyListMessage = () => {
+                if (taskList.children.length === 0) {
+                    emptyListMessage.classList.remove('hidden');
+                } else {
+                    emptyListMessage.classList.add('hidden');
+                }
+            };
+
+            // Function to attach all event listeners to a task item
+            const attachTaskEventListeners = (listItem) => {
+                const checkbox = listItem.querySelector('.task-checkbox');
+                const editButton = listItem.querySelector('.edit-button');
+                const deleteButton = listItem.querySelector('.delete-button');
+                let taskTextSpan = listItem.querySelector('.task-text'); // This will be updated to input during edit
+
+                // Toggle completion status
+                checkbox.addEventListener('change', () => {
+                    listItem.classList.toggle('completed');
+                });
+
+                // Edit task functionality
+                editButton.addEventListener('click', () => {
+                    if (editButton.textContent === 'Edit') {
+                        // Switch to edit mode
+                        const currentText = taskTextSpan.textContent;
+                        const editInput = document.createElement('input');
+                        editInput.type = 'text';
+                        editInput.value = currentText;
+                        editInput.classList.add('task-input-edit'); // Use specific class for edit input styling
+                        taskTextSpan.replaceWith(editInput);
+                        taskTextSpan = editInput; // Update reference to the new input element
+                        editInput.focus();
+                        editInput.select(); // Select all text for easy editing
+                        editButton.textContent = 'Save';
+                        checkbox.disabled = true; // Disable checkbox during edit
+                        editButton.dataset.originalText = currentText; // Store original text
+                    } else {
+                        // Save changes
+                        const newText = taskTextSpan.value.trim();
+                        if (newText) {
+                            const newSpan = document.createElement('span');
+                            newSpan.classList.add('task-text');
+                            newSpan.textContent = newText;
+                            taskTextSpan.replaceWith(newSpan);
+                            taskTextSpan = newSpan; // Update reference back to span
+                            editButton.textContent = 'Edit';
+                            checkbox.disabled = false; // Re-enable checkbox
+                        } else {
+                            // If empty, revert to original text
+                            const newSpan = document.createElement('span');
+                            newSpan.classList.add('task-text');
+                            newSpan.textContent = editButton.dataset.originalText;
+                            taskTextSpan.replaceWith(newSpan);
+                            taskTextSpan = newSpan; // Update reference back to span
+                            editButton.textContent = 'Edit';
+                            checkbox.disabled = false; // Re-enable checkbox
+                        }
+                    }
+                });
+
+                // Handle Enter key for saving edit
+                listItem.addEventListener('keypress', (event) => {
+                    // Check if we are in edit mode (edit button says 'Save') and Enter key is pressed
+                    if (event.key === 'Enter' && editButton.textContent === 'Save') {
+                        editButton.click(); // Simulate click on save button
+                        event.preventDefault(); // Prevent default Enter key behavior (e.g., new line in input)
+                    }
+                });
+
+                // Delete task functionality
+                deleteButton.addEventListener('click', () => {
+                    listItem.remove();
+                    updateEmptyListMessage(); // Update message after deletion
+                });
+            };
+
+            // Function to create a new task element and attach listeners
+            const createTaskElement = (taskTextContent, isCompleted = false) => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('task-item', 'flex', 'items-center', 'justify-between', 'shadow-sm');
+                if (isCompleted) {
+                    listItem.classList.add('completed');
+                }
+
+                listItem.innerHTML = `
+                    <div class="task-content">
+                        <input type="checkbox" class="task-checkbox" ${isCompleted ? 'checked' : ''}>
+                        <span class="task-text">${taskTextContent}</span>
+                    </div>
+                    <div class="task-actions">
+                        <button class="action-button edit-button">Edit</button>
+                        <button class="action-button delete-button">Delete</button>
+                    </div>
+                `;
+                attachTaskEventListeners(listItem); // Attach listeners immediately after creation
+                return listItem;
+            };
+
+            // Add new task
+            addTaskButton.addEventListener('click', () => {
+                const taskText = taskInput.value.trim();
+                if (taskText) {
+                    const newTask = createTaskElement(taskText);
+                    taskList.appendChild(newTask);
+                    taskInput.value = ''; // Clear input
+                    updateEmptyListMessage(); // Update message after adding
+                }
+            });
+
+            // Allow adding task with Enter key
+            taskInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    addTaskButton.click();
+                }
+            });
+
+            // IMPORTANT: Attach listeners to ALL existing tasks when the page loads
+            document.querySelectorAll('.task-item').forEach(listItem => {
+                attachTaskEventListeners(listItem);
+            });
+
+            // Initial check for empty list on load
+            updateEmptyListMessage();
+        });
+    </script>
+</body>
+</html>
